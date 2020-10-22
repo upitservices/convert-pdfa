@@ -1,0 +1,5 @@
+{
+    "gs_executable": "path for your GhostScript executable",
+    "source_dir": "path for your PDF to be converted",
+    "destination_dir": "path where your final PDF/A will be stored after conversion"
+}
