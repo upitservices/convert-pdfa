@@ -3,7 +3,7 @@
 Simple python script to convert all PDF files from a source folder into PDF/A
 using GhostScript.
 
-## Instalation
+## Installation
 
 You'll need to install ghostscript, and python3 to run this script. For now,
 just tested under Ubuntu environment, but since Windows does have versions for
