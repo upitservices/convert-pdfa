@@ -13,9 +13,13 @@ these dependencies, I think you'll be able to install them under Microsoft OS.
 
 `sudo apt install python3 ghostscript`
 
-After installing python and GS, clone this repository wherever you want and
-rename the file *conf.json.example* to *conf.json*. There will be 3 parameters
-to be set:
+After installing python and GS, clone this repository wherever you want.
+If your Python installation has Tk, just execute `python config.py`, set the
+fields to the paths for your GS, source and destination folder and your're done.
+The tool will create the conf.json file for you.
+
+If you just want to set the json file manually, rename the *conf.json.example* 
+to *conf.json*. There will be 3 parameters to be set:
 
 - gs_executable: The path for your Ghostscript installation. (If it is in the system path, just put the name of the command, e.g: gs)
 - source_dir: The full path for the source PDF files
