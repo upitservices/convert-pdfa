@@ -1,45 +1,67 @@
-import subprocess
 import os
 import json
+import sys
+import argparse
 from pathlib import Path
+from ocr import Ocr
+from pdfa import PdfA
 
-gs_executable = None
-source_dir = None
-destination_dir = None
+class Main():
 
-path_to_current_file = os.path.realpath(__file__)
-current_directory = os.path.split(path_to_current_file)[0]
-conf_path = os.path.join(current_directory, "conf.json")
+    confs = None
 
-with open(conf_path, encoding='utf-8') as json_file:
-    data = json.load(json_file)
-    source_dir = Path(data['source_dir'])
-    destination_dir = Path(data['destination_dir'])
-    gs_executable = r"{}".format(data['gs_executable'])
+    def __init__(self):
+        self.read_config()
 
-if not data or not source_dir or not destination_dir or not gs_executable:
-    print('Missing config parameters')
-    exit()
+    def read_config(self):
+        path_to_current_file = os.path.realpath(__file__)
+        current_directory = os.path.split(path_to_current_file)[0]
+        conf_path = os.path.join(current_directory, "conf.json")
 
-gs_command = [gs_executable, '-dPDFA', '-dBATCH', '-dNOPAUSE', 
-                   '-sColorConversionStrategy=UseDeviceIndependentColor',
-                   '-sDEVICE=pdfwrite', '-dPDFACompatibilityPolicy=1']
+        with open(conf_path, encoding='utf-8') as json_file:
+            data = json.load(json_file)
+            self.confs = {
+                'source_dir': Path(data['source_dir']),
+                'destination_dir': Path(data['destination_dir']),
+                'destination_dir_img': Path(data['destination_dir_img']),
+                'destination_dir_ocr': Path(data['destination_dir_ocr']),
+                'gs_executable': r"{}".format(data['gs_executable']),
+                'tesseract_executable': r"{}".format(data['tesseract_executable']),
+            }
 
-def convert(file_src_path, dest_path):
-    cwd = os.getcwd()
-    os.chdir(os.path.dirname(dest_path))
-    try:
-        subprocess.check_output(gs_command + ['-sOutputFile=' + dest_path , file_src_path])
-        os.remove(file_src_path)
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError("'{}' returned the following error: (code {}): {}".format(e.cmd, e.returncode, e.output))
+        if not data or not self.confs['source_dir'] or not self.confs['gs_executable']:
+            print('Missing config parameters')
+            return False
 
-    os.chdir(cwd)
+        return True
 
-for dirname, subdirs, files in os.walk(source_dir):
-    for file in [f for f in files if f.upper().endswith("PDF")]:
-        full_path = os.path.join(dirname, file)
-        full_dest_path = os.path.join(destination_dir, os.path.basename(full_path))
-        print("Converting File: {}".format(full_path))
-        convert(full_path, full_dest_path)
+    def execute(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--file', help='PDF file to be converted')
+        parser.add_argument('--ocr', help='true to make the PDF searchable before converting to PDF/A')
+        parser.add_argument('--keep_filename', help='true to keep the original filename after conversion')
+        args = parser.parse_args()
 
+        filePath = None
+
+        if args.ocr == 'true':
+            ocr = Ocr(self.confs)
+            if args.file == None:
+                ocr.convert_folder(True if args.keep_filename == 'true' else False)
+            else:
+                filePath = ocr.convert_file(args.file, True if args.keep_filename == 'true' else False)
+        
+        pdfa = PdfA(self.confs)
+        if args.file == None and filePath == None:
+            keep_filename = True if args.keep_filename == 'true' else False
+            origin_ocr = True if args.ocr == 'true' else False
+            pdfa.convert_folder(keep_filename, origin_ocr)
+        else:
+            delete_original = True # @todo: Create a parameter, so the user can choose
+            keep_filename = True if args.keep_filename == 'true' else False
+            if filePath == None:
+                filePath = args.file
+            pdfa.convert_file(filePath, delete_original, keep_filename)
+
+main = Main()
+main.execute()

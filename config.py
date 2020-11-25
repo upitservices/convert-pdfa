@@ -12,6 +12,7 @@ class App():
     txt_source = None
     txt_dest = None
     txt_dest_img = None
+    txt_dest_ocr = None
 
     path_to_current_file = os.path.realpath(__file__)
     current_directory = os.path.split(path_to_current_file)[0]
@@ -59,8 +60,15 @@ class App():
         self.txt_dest_img = Entry(self.window)
         self.txt_dest_img.grid(row=4, column=1, columnspan=4, sticky=N+W+E, padx=self.DEFPAD, pady=self.DEFPAD)
 
+        # Destination for the final searchable PDF file
+        lbl_dest_ocr = Label(self.window, text="OCR Destination Path")
+        lbl_dest_ocr.grid(row=5, column=0, columnspan=1, sticky=N+W, padx=self.DEFPAD, pady=self.DEFPAD)
+
+        self.txt_dest_ocr = Entry(self.window)
+        self.txt_dest_ocr.grid(row=5, column=1, columnspan=4, sticky=N+W+E, padx=self.DEFPAD, pady=self.DEFPAD)
+
         btn = Button(self.window, text="Save", command=self.save)
-        btn.grid(row=5, column=1, columnspan=4, sticky=S+W+E, padx=self.DEFPAD, pady=self.DEFPAD)
+        btn.grid(row=6, column=1, columnspan=4, sticky=S+W+E, padx=self.DEFPAD, pady=self.DEFPAD)
 
         # Window Properties
         self.window.title('Convert PDF/A Config Tool')
@@ -74,7 +82,8 @@ class App():
             'tesseract_executable': self.txt_tesseract.get(),
             'source_dir': self.txt_source.get(),
             'destination_dir': self.txt_dest.get(),
-            'destination_dir_img': self.txt_dest_img.get()
+            'destination_dir_img': self.txt_dest_img.get(),
+            'destination_dir_ocr': self.txt_dest_ocr.get()
         }
 
         try:
@@ -99,12 +108,14 @@ class App():
                 self.txt_source = self.set_text(Path(data['source_dir']), self.txt_source)
                 self.txt_dest = self.set_text(Path(data['destination_dir']), self.txt_dest)
                 self.txt_dest_img = self.set_text(Path(data['destination_dir_img']), self.txt_dest_img)
+                self.txt_dest_ocr = self.set_text(Path(data['destination_dir_ocr']), self.txt_dest_ocr)
         except:
                 self.txt_gs = self.set_text("", self.txt_gs)
                 self.txt_tesseract = self.set_text("", self.txt_tesseract)
                 self.txt_source = self.set_text("", self.txt_source)
                 self.txt_dest = self.set_text("", self.txt_dest)
                 self.txt_dest_img = self.set_text("", self.txt_dest_img)
+                self.txt_dest_ocr = self.set_text("", self.txt_dest_ocr)
 
 
 app = App()

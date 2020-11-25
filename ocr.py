@@ -21,7 +21,7 @@ class Ocr():
     def __init__(self, confs):
         self.gs_executable = confs['gs_executable']
         self.source_dir = confs['source_dir']
-        self.destination_dir = confs['destination_dir']
+        self.destination_dir = confs['destination_dir_ocr']
         self.destination_dir_img = confs['destination_dir_img']
         pytesseract.pytesseract.tesseract_cmd = confs['tesseract_executable']
 
@@ -48,7 +48,7 @@ class Ocr():
         if keep_filename:
             filename = os.path.basename(file_path)
 
-        self.save_resulting_pdf(full_dest_path, filename)
+        return self.save_resulting_pdf(full_dest_path, filename)
     
     def convert_folder(self, keep_filename = False):
         for dirname, subdirs, files in os.walk(self.source_dir):
@@ -57,12 +57,17 @@ class Ocr():
                 self.convert_file(full_path, keep_filename)
 
     def save_resulting_pdf(self, tiff_path, filename):
-        pdf = pytesseract.image_to_pdf_or_hocr(tiff_path, extension='pdf')
-        with open(os.path.join(self.destination_dir, filename), 'w+b') as f:
-            f.write(pdf)
-        
-        # Removing the tiff source
-        os.remove(tiff_path)
+        try:
+            pdf = pytesseract.image_to_pdf_or_hocr(tiff_path, extension='pdf')
+            pdf_path = os.path.join(self.destination_dir, filename)
+            with open(pdf_path, 'w+b') as f:
+                f.write(pdf)
+            
+            # Removing the tiff source
+            os.remove(tiff_path)
+            # @todo: Check if the final PDF was really generated. Then, based on the user choice, remove the source path
+            return pdf_path
+        except:
+            print("Error while converting file: {}".format(filename))
 
-        # @todo: Check if the final PDF was really generated. Then, based on the user choice, remove the source path
         
