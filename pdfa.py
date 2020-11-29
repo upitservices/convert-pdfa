@@ -52,9 +52,9 @@ class PdfA():
         full_dest_path = os.path.join(self.destination_dir, filename)
         self.convert(file_path, full_dest_path, delete_original)
     
-    def convert_folder(self, keep_filename = False, origin_ocr = False):
+    def convert_folder(self, keep_filename = False, origin_ocr = False, delete_original = False):
+        # If files are coming from the OCR, then I'll use the OCR destination folder
         source_dir = self.source_dir if origin_ocr == False else self.destination_dir_ocr
-        delete_original = origin_ocr
         for dirname, subdirs, files in os.walk(source_dir):
             for file in [f for f in files if f.upper().endswith("PDF")]:
                 full_path = os.path.join(dirname, file)

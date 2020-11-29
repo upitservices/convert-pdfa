@@ -37,7 +37,7 @@ class Ocr():
 
         os.chdir(cwd)
 
-    def convert_file(self, file_path, keep_filename = False):
+    def convert_file(self, file_path, delete_original = False, keep_filename = False):
         str_date_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
         random_hash = random.getrandbits(128)
         filename = "converted-{}-{}.pdf".format(random_hash, str_date_time)
@@ -48,13 +48,16 @@ class Ocr():
         if keep_filename:
             filename = os.path.basename(file_path)
 
+        if delete_original:
+            os.remove(file_path)
+
         return self.save_resulting_pdf(full_dest_path, filename)
     
-    def convert_folder(self, keep_filename = False):
+    def convert_folder(self, delete_original = False, keep_filename = False):
         for dirname, subdirs, files in os.walk(self.source_dir):
             for file in [f for f in files if f.upper().endswith("PDF")]:
                 full_path = os.path.join(dirname, file)
-                self.convert_file(full_path, keep_filename)
+                self.convert_file(full_path, delete_original, keep_filename)
 
     def save_resulting_pdf(self, tiff_path, filename):
         try:
