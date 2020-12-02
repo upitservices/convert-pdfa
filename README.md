@@ -5,8 +5,9 @@ using GhostScript.
 
 ## Installation
 
-You'll need to install [ghostscript](https://www.ghostscript.com/), [tesseract](https://github.com/tesseract-ocr/tesseract) and python3 to run this script. For now,
+You'll need to install [ghostscript](https://www.ghostscript.com/), [tesseract](https://github.com/tesseract-ocr/tesseract) and python3 to run this script. 
 
+This script was tested under Ubuntu 20.10, Windows 10 Home and Windows Server 2012R2.
 
 ### If you're using Ubuntu, just use apt
 
@@ -49,7 +50,7 @@ optional arguments:
                         true to keep the original filename after conversion
 ```
 
-## Licence
+## License
 
 This script is licensed as Apache Software License 2.0, but since it 
 uses Ghostscript, might be under it's own license.
